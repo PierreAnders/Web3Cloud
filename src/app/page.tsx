@@ -5,11 +5,10 @@ import { client } from "./client";
 
 export default function Home() {
   return (
-    <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
+    <main className="container mx-auto flex min-h-screen max-w-screen-lg items-center justify-center p-4 pb-10">
       <div className="py-20">
         <Header />
-
-        <div className="flex justify-center mb-20">
+        <div className="mb-20 flex justify-center">
           <ConnectButton
             client={client}
             appMetadata={{
@@ -27,7 +26,7 @@ export default function Home() {
 
 function Header() {
   return (
-    <header className="flex flex-col items-center mb-20 md:mb-20">
+    <header className="mb-20 flex flex-col items-center md:mb-20">
       <Image
         src={thirdwebIcon}
         alt=""
@@ -37,15 +36,15 @@ function Header() {
         }}
       />
 
-      <h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-6 text-zinc-100">
+      <h1 className="mb-6 text-2xl font-semibold tracking-tighter text-zinc-100 md:text-6xl md:font-bold">
         thirdweb SDK
-        <span className="text-zinc-300 inline-block mx-1"> + </span>
+        <span className="mx-1 inline-block text-zinc-300"> + </span>
         <span className="inline-block -skew-x-6 text-blue-500"> Next.js </span>
       </h1>
 
-      <p className="text-zinc-300 text-base">
+      <p className="text-base text-zinc-300">
         Read the{" "}
-        <code className="bg-zinc-800 text-zinc-300 px-2 rounded py-1 text-sm mx-1">
+        <code className="mx-1 rounded bg-zinc-800 px-2 py-1 text-sm text-zinc-300">
           README.md
         </code>{" "}
         file to get started.
@@ -56,7 +55,7 @@ function Header() {
 
 function ThirdwebResources() {
   return (
-    <div className="grid gap-4 lg:grid-cols-3 justify-center">
+    <div className="grid justify-center gap-4 lg:grid-cols-3">
       <ArticleCard
         title="thirdweb SDK Docs"
         href="https://portal.thirdweb.com/typescript/v5"
@@ -85,12 +84,12 @@ function ArticleCard(props: {
 }) {
   return (
     <a
-      href={props.href + "?utm_source=next-template"}
+      href={`${props.href}?utm_source=next-template`}
       target="_blank"
-      className="flex flex-col border border-zinc-800 p-4 rounded-lg hover:bg-zinc-900 transition-colors hover:border-zinc-700"
+      className="flex flex-col rounded-lg border border-zinc-800 p-4 transition-colors hover:border-zinc-700 hover:bg-zinc-900"
     >
       <article>
-        <h2 className="text-lg font-semibold mb-2">{props.title}</h2>
+        <h2 className="mb-2 text-lg font-semibold">{props.title}</h2>
         <p className="text-sm text-zinc-400">{props.description}</p>
       </article>
     </a>
