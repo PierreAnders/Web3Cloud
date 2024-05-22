@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ConnectButton } from "thirdweb/react";
 import { client } from "./client";
 import { upload } from "thirdweb/storage";
+import { MediaRenderer } from "thirdweb/react";
 
 export default function Home() {
   
@@ -54,6 +55,9 @@ export default function Home() {
         >
           Upload File
         </button>
+        <MediaRenderer client={client}
+          src="ipfs://bafybeie5lint37xnnap3wism6wysn2a6c5tdcuv64nwanfmhd7wlqufmmi/solana.avif"
+        />
       </div>
     </main>
   );
