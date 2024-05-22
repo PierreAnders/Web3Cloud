@@ -1,12 +1,8 @@
-"use client";
-
 import React, { useState } from "react";
-import { ConnectButton } from "thirdweb/react";
-import { client } from "./client";
 import { upload } from "thirdweb/storage";
+import { client } from "./client";
 
-export default function Home() {
-  
+export default function FileUpload ({ client }) {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleFileChange = (event: any) => {
@@ -22,6 +18,7 @@ export default function Home() {
       alert("Veuillez sélectionner un fichier à téléverser.");
       return;
     }
+
     try {
       const uris = await upload({
         client,
@@ -36,25 +33,11 @@ export default function Home() {
   };
 
   return (
-    <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
-      <div className="py-20">
-        <div className="flex justify-center mb-20">
-          <ConnectButton
-            client={client}
-            appMetadata={{
-              name: "Example App",
-              url: "https://example.com",
-            }}
-          />
-        </div>
-        <input type="file" onChange={handleFileChange} />
-        <button
-          onClick={handleFileUpload}
-          className="ml-4 py-2 px-4 bg-blue-500 text-white rounded"
-        >
-          Upload File
-        </button>
-      </div>
-    </main>
+    <div>
+      <input type="file" onChange={handleFileChange} />
+      <button onClick={handleFileUpload} className="py-2 px-4 bg-blue-500 text-white rounded">
+        Téléverser le fichier
+      </button>
+    </div>
   );
-}
+};
