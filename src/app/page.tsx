@@ -4,8 +4,12 @@ import React, { useState } from "react";
 import { ConnectButton } from "thirdweb/react";
 import { client } from "./client";
 import { upload } from "thirdweb/storage";
+import { FlipWords } from "@/components/ui/flip-words";
 
 export default function Home() {
+
+    const words = ["bienvenue", "dans", "le", "Web3"];
+
   
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -37,6 +41,11 @@ export default function Home() {
 
   return (
     <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
+            <div className="h-[40rem] flex justify-center items-center px-4">
+      <div className="text-4xl mx-auto font-normal text-neutral-600 dark:text-neutral-400">
+        <FlipWords words={words} /> <br />
+      </div>
+    </div>
       <div className="py-20">
         <div className="flex justify-center mb-20">
           <ConnectButton
