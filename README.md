@@ -17,25 +17,25 @@ const clientId = "......";
 ### Install dependencies
 
 ```bash
-yarn
+pnpm i
 ```
 
 ### Start development server
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 ### Create a production build
 
 ```bash
-yarn build
+pnpm build
 ```
 
 ### Preview the production build
 
 ```bash
-yarn start
+pnpm start
 ```
 
 ## Resources
