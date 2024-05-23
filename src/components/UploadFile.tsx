@@ -30,7 +30,8 @@ export const UploadComponent = () => {
         client,
         files: [selectedFile],
       });
-      setFileUri(uris[0]);
+      console.log("Fichier téléversé avec succès, URIs: ", uris);
+      setFileUri(uris);
       setError("");
     } catch (error) {
       setError("Error uploading file.");
@@ -57,7 +58,7 @@ export const UploadComponent = () => {
         <div className="flex flex-col items-center space-y-2">
           <div>File uploaded successfully!</div>
           <a href={fileUri} target="_blank" rel="noreferrer">
-            Link to the file ({fileUri})
+            Link to the file
           </a>
         </div>
       )}
