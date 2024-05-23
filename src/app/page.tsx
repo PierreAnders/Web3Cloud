@@ -4,13 +4,10 @@ import React, { useState } from "react";
 import { ConnectButton } from "thirdweb/react";
 import { client } from "./client";
 import { upload } from "thirdweb/storage";
-import { FlipWords } from "@/components/ui/flip-words";
+import { HeroSection } from "@/components/HeroSection";
 
 export default function Home() {
 
-    const words = ["bienvenue", "dans", "le", "Web3"];
-
-  
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleFileChange = (event: any) => {
@@ -40,30 +37,17 @@ export default function Home() {
   };
 
   return (
-    <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
-            <div className="h-[40rem] flex justify-center items-center px-4">
-      <div className="text-4xl mx-auto font-normal text-neutral-600 dark:text-neutral-400">
-        <FlipWords words={words} /> <br />
-      </div>
-    </div>
-      <div className="py-20">
-        <div className="flex justify-center mb-20">
-          <ConnectButton
-            client={client}
-            appMetadata={{
-              name: "Example App",
-              url: "https://example.com",
-            }}
-          />
+    <main className="mx-auto">
+      <HeroSection/>
+        <div className="mb-20 flex justify-center">
         </div>
         <input type="file" onChange={handleFileChange} />
         <button
           onClick={handleFileUpload}
-          className="ml-4 py-2 px-4 bg-blue-500 text-white rounded"
+          className="ml-4 rounded bg-blue-500 px-4 py-2 text-white"
         >
           Upload File
         </button>
-      </div>
     </main>
   );
 }
