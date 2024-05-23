@@ -3,7 +3,7 @@ import { client } from "@/app/client";
 import { HeroHighlight, Highlight } from "@/components/ui/hero-highlight";
 import { motion } from "framer-motion";
 import { ConnectButton } from "thirdweb/react";
- 
+
 export function HeroSection() {
   return (
     <HeroHighlight>
@@ -23,20 +23,18 @@ export function HeroSection() {
         className="mx-auto max-w-4xl px-4 text-center text-2xl font-bold leading-relaxed text-white md:text-4xl lg:text-5xl lg:leading-snug "
       >
         Welcome to the world of <br />
-
         <Highlight className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
           web 3
         </Highlight>
-
-      <div className="mt-16 flex justify-center">
-        <ConnectButton
+        <div className="mt-16 flex justify-center">
+          <ConnectButton
             client={client}
             appMetadata={{
               name: "Example App",
               url: "https://example.com",
             }}
           />
-      </div>
+        </div>
       </motion.h1>
     </HeroHighlight>
   );
