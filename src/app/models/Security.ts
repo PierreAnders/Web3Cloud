@@ -1,4 +1,4 @@
-const { createCipheriv, createDecipheriv, randomBytes, scryptSync } = require('crypto');
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto';
 
 export class Security {
     private algorithm = 'aes-192-cbc';
