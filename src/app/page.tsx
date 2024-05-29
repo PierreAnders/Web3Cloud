@@ -1,7 +1,9 @@
+"use client"
 import type { FileMetadata } from "@/app/models/FileMetadata";
 import { files, categories } from "@/app/models/FileMetadata";
 import { HeroSection } from "@/components/HeroSection";
 import { UploadComponent } from "@/components/UploadFile";
+import { useActiveAccount } from "thirdweb/react";
 import {
   Command,
   CommandEmpty,
@@ -13,6 +15,8 @@ import {
 } from "@/components/ui/command";
 
 export default function Home() {
+  const account = useActiveAccount();
+
   return (
     <main className="mx-auto">
       <HeroSection />
@@ -39,6 +43,7 @@ export default function Home() {
       <div className="mb-20 mt-12 flex justify-center">
         <UploadComponent />
       </div>
+      <div className="flex justify-center text-gray-600 text-sm">ETH Address: {account?.address}</div>
     </main>
   );
 }
