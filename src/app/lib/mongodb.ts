@@ -1,9 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  throw new Error(
+    "Please define the MONGODB_URI environment variable inside .env.local",
+  );
 }
 
 let cached = global.mongoose;
@@ -27,25 +29,3 @@ async function connectToDatabase() {
 }
 
 export default connectToDatabase;
-// import { MongoClient } from 'mongodb';
-
-// const uri = process.env.MONGODB_URI;
-// let client;
-// let clientPromise;
-
-// if (!process.env.MONGODB_URI) {
-//   throw new Error('Please add your Mongo URI to .env.local');
-// }
-
-// if (process.env.NODE_ENV === 'development') {
-//   if (!global._mongoClientPromise) {
-//     client = new MongoClient(uri);
-//     global._mongoClientPromise = client.connect();
-//   }
-//   clientPromise = global._mongoClientPromise;
-// } else {
-//   client = new MongoClient(uri);
-//   clientPromise = client.connect();
-// }
-
-// export default clientPromise;
