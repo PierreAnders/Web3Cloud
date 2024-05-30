@@ -1,14 +1,18 @@
 "use client";
-import React, { useState } from "react";
+
 import { client } from "@/app/client";
-import { upload } from "thirdweb/storage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
+import React, { useState } from "react";
+import { useActiveAccount } from "thirdweb/react";
+import { upload } from "thirdweb/storage";
 
-export const UploadComponent = () => {
+export const UploadComponent: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileUri, setFileUri] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const account = useActiveAccount();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -33,8 +37,15 @@ export const UploadComponent = () => {
       console.log("Fichier téléversé avec succès, URIs: ", uris);
       setFileUri(uris);
       setError("");
+
+      // Enregistrer l'adresse de l'utilisateur et les URIs dans la base de données
+      await axios.post("api/userfile/save", {
+        address: account?.address,
+        fileUris: uris,
+      });
     } catch (error) {
       setError("Error uploading file.");
+      console.log(error);
     }
   };
 

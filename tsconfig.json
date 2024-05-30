@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@email/*": ["./emails/*"]
+      "@email/*": ["./emails/*"],
+        "@/lib/*": ["./utils/lib/*"]
     }
   },
 
