@@ -43,7 +43,7 @@ export default function Home() {
       <div className="mb-20 mt-12 flex justify-center">
         <UploadComponent />
       </div>
-      <div className="flex justify-center text-gray-600 text-sm">ETH Address: {account?.address}</div>
+      <div className="flex justify-center text-sm text-gray-600">ETH Address: {account?.address}</div>
     </main>
   );
 }

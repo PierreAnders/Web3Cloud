@@ -1,15 +1,12 @@
+
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-/**
- * Global est utilisé ici pour maintenir une connexion cache
- * entre les rechargements de modules en développement.
- */
 let cached = global.mongoose;
 
 if (!cached) {
@@ -23,7 +20,8 @@ async function connectToDatabase() {
 
   if (!cached.promise) {
     const opts = {
-      bufferCommands: false,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
@@ -35,3 +33,26 @@ async function connectToDatabase() {
 }
 
 export default connectToDatabase;
+
+// import { MongoClient } from 'mongodb';
+
+// const uri = process.env.MONGODB_URI;
+// let client;
+// let clientPromise;
+
+// if (!process.env.MONGODB_URI) {
+//   throw new Error('Please add your Mongo URI to .env.local');
+// }
+
+// if (process.env.NODE_ENV === 'development') {
+//   if (!global._mongoClientPromise) {
+//     client = new MongoClient(uri);
+//     global._mongoClientPromise = client.connect();
+//   }
+//   clientPromise = global._mongoClientPromise;
+// } else {
+//   client = new MongoClient(uri);
+//   clientPromise = client.connect();
+// }
+
+// export default clientPromise;
