@@ -30,18 +30,18 @@ export const UploadComponent: React.FC = () => {
       return;
     }
     try {
-      // const uris = await upload({
-      //   client,
-      //   files: [selectedFile],
-      // });
-      // console.log("Fichier téléversé avec succès, URIs: ", uris);
-      // setFileUri(uris);
-      // setError("");
+      const uris = await upload({
+        client,
+        files: [selectedFile],
+      });
+      console.log("Fichier téléversé avec succès, URIs: ", uris);
+      setFileUri(uris);
+      setError("");
 
       // Enregistrer l'adresse de l'utilisateur et les URIs dans la base de données
-      await axios.post('pages/api/userfile/save', {
+      await axios.post('api/userfile/save', {
         address: account?.address,
-        fileUris: "test uri",
+        fileUris: uris,
       });
     } catch (error) {
       setError("Error uploading file.");

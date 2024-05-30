@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -19,12 +18,7 @@ async function connectToDatabase() {
   }
 
   if (!cached.promise) {
-    const opts = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
       return mongoose;
     });
   }
@@ -33,7 +27,6 @@ async function connectToDatabase() {
 }
 
 export default connectToDatabase;
-
 // import { MongoClient } from 'mongodb';
 
 // const uri = process.env.MONGODB_URI;
