@@ -38,7 +38,6 @@ export const UploadComponent: React.FC = () => {
       setFileUri(uris);
       setError("");
 
-      // Enregistrer l'adresse de l'utilisateur et les URIs dans la base de données
       await axios.post("api/userfile/save", {
         address: account?.address,
         fileUris: uris,
