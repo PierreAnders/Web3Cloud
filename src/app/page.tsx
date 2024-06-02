@@ -15,13 +15,13 @@ export default function Home() {
       <div className="mb-20 mt-12 flex justify-center">
         <UploadComponent />
       </div>
-      {/* <div className="mx-auto mt-4 w-2/3"> */}
+      <div className="mx-auto mt-4 w-2/3">
       {/* <SearchBarComponent /> */}
-      {/* </div> */}
+      </div>
       <div className="mb-2 mt-2 flex justify-center">
         <FetchFilesComponent />
       </div>
-      <div className="flex justify-center text-gray-600 text-sm">ETH Address: {account?.address}</div>
+      <div className="flex justify-center text-gray-600 text-xs mt-10 mb-6">ETH: {account?.address}</div>
     </main>
   );
 }
