@@ -4,11 +4,18 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import { MediaRenderer } from "thirdweb/react";
-import UserFile from "@/app/models/UserFile";
 
+interface IFileMetadata {
+  _id: string;
+  name: string;
+  uri: string;
+  category?: string;
+  isPrivate: boolean;
+  owner: string;
+}
 
 export const FetchFilesComponent: React.FC = () => {
-  const [files, setFiles] = useState<UserFile[]>([]);
+  const [files, setFiles] = useState<IFileMetadata[]>([]);
   const [error, setError] = useState<string>("");
   const account = useActiveAccount();
 
@@ -19,7 +26,7 @@ export const FetchFilesComponent: React.FC = () => {
         return;
       }
       try {
-        const url = `http://localhost:3000/api/userfile/read?address=${account.address}`;
+        const url = `http://localhost:3000/api/filemetadata/read?owner=${account.address}`;
 
         const response = await axios.get(url);
         console.log('Response:', response);
@@ -41,15 +48,14 @@ export const FetchFilesComponent: React.FC = () => {
 
       {files.length > 0 && (
         <div className="flex flex-col items-center space-y-2">
-            {files.map((file) => (
-              <div key={file._id}>
-                  {file.fileUris.map((uri, uriIndex) => (
-                    <div key={uriIndex}>
-                      <MediaRenderer src={uri} /> 
-                    </div>
-                  ))}
-              </div>
-            ))}
+          {files.map((file) => (
+            <div key={file._id} className="border p-4 rounded shadow">
+              <h3 className="text-lg font-bold">{file.name}</h3>
+              <p>Category: {file.category || "N/A"}</p>
+              <p>Private: {file.isPrivate ? "Yes" : "No"}</p>
+              <MediaRenderer src={file.uri} />
+            </div>
+          ))}
         </div>
       )}
     </div>

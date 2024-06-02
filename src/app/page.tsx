@@ -4,7 +4,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { UploadComponent } from "@/components/UploadFile";
 import { FetchFilesComponent } from "@/components/DisplayFile";
 import { useActiveAccount } from "thirdweb/react";
-import { SearchBarComponent } from '@/components/SearchBar';
+// import { SearchBarComponent } from '@/components/SearchBar';
 
 export default function Home() {
   const account = useActiveAccount();
@@ -14,7 +14,7 @@ export default function Home() {
       <HeroSection />
       <div className="mx-auto mt-4 w-2/3">
       </div>
-      <SearchBarComponent />
+      {/* <SearchBarComponent /> */}
       <div className="mb-2 mt-2 flex justify-center">
         <FetchFilesComponent />
       </div>

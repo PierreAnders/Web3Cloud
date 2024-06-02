@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import connectToDatabase from "@/app/lib/mongodb";
-import UserFile from "@/app/models/UserFile";
+import FileMetadata from "@/app/models/FileMetadata";
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,19 +14,19 @@ export default async function handler(
 
   if (req.method === "GET") {
     try {
-      const { address } = req.query;
+      const { owner } = req.query;
 
-      if (!address) {
-        return res.status(400).json({ message: "Address is required" });
+      if (!owner) {
+        return res.status(400).json({ message: "Owner Address is required" });
       }
 
-      const userFiles = await UserFile.find({ address });
+      const filesMetadata = await FileMetadata.find({ owner });
 
-      if (!userFiles.length) {
-        return res.status(404).json({ message: "No files found for this address" });
+      if (!filesMetadata.length) {
+        return res.status(404).json({ message: "No files found for this owner" });
       }
 
-      res.status(200).json(userFiles);
+      res.status(200).json(filesMetadata);
     } catch (error) {
       res.status(500).json({ message: "Server error" });
     }
