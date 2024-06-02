@@ -4,12 +4,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import { MediaRenderer } from "thirdweb/react";
+import UserFile from "@/app/models/UserFile";
 
-interface UserFile {
-  _id: string;
-  address: string;
-  fileUris: string[];
-}
 
 export const FetchFilesComponent: React.FC = () => {
   const [files, setFiles] = useState<UserFile[]>([]);
@@ -24,15 +20,14 @@ export const FetchFilesComponent: React.FC = () => {
       }
       try {
         const url = `http://localhost:3000/api/userfile/read?address=${account.address}`;
-        console.log('Fetching URL:', url); // Debugging URL
 
         const response = await axios.get(url);
-        console.log('Response:', response); // Debugging response
+        console.log('Response:', response);
 
         setFiles(response.data);
         setError("");
       } catch (error) {
-        console.error('Error fetching files:', error); // Debugging error
+        console.error('Error fetching files:', error);
         setError("Error fetching files.");
       }
     };
