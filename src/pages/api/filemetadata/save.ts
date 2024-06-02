@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import connectToDatabase from "@/app/lib/mongodb";
-import UserFile from "@/app/models/UserFile";
+import FileMetadata from "@/app/models/FileMetadata";
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,15 +13,18 @@ export default async function handler(
   await connectToDatabase();
 
   if (req.method === "POST") {
-    const { address, fileUris } = req.body;
+    const { name, uri, category, isPrivate, owner  } = req.body;
 
     try {
-      const newUserFile = new UserFile({
-        address,
-        fileUris,
+      const newFileMetadata = new FileMetadata({
+        name,
+        uri,
+        category,
+        isPrivate,
+        owner
       });
 
-      await newUserFile.save();
+      await newFileMetadata.save();
       res.status(201).json({ message: "Data saved successfully" });
     } catch (error) {
       res.status(500).json({ message: "Server error" });
