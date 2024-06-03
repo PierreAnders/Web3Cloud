@@ -12,16 +12,16 @@ export default function Home() {
   return (
     <main className="mx-auto">
       <HeroSection />
-      <div className="mx-auto mt-4 w-2/3">
-      </div>
-      {/* <SearchBarComponent /> */}
-      <div className="mb-2 mt-2 flex justify-center">
-        <FetchFilesComponent />
-      </div>
       <div className="mb-20 mt-12 flex justify-center">
         <UploadComponent />
       </div>
-      <div className="flex justify-center text-gray-600 text-sm">ETH Address: {account?.address}</div>
+      <div className="mx-auto mt-4 w-2/3">
+      {/* <SearchBarComponent /> */}
+      </div>
+      <div className="mb-2 mt-2 flex justify-center">
+        <FetchFilesComponent />
+      </div>
+      <div className="flex justify-center text-gray-600 text-xs mt-10 mb-6">ETH: {account?.address}</div>
     </main>
   );
 }

@@ -4,6 +4,14 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import { MediaRenderer } from "thirdweb/react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface IFileMetadata {
   _id: string;
@@ -29,12 +37,12 @@ export const FetchFilesComponent: React.FC = () => {
         const url = `http://localhost:3000/api/filemetadata/read?owner=${account.address}`;
 
         const response = await axios.get(url);
-        console.log('Response:', response);
+        console.log("Response:", response);
 
         setFiles(response.data);
         setError("");
       } catch (error) {
-        console.error('Error fetching files:', error);
+        console.error("Error fetching files:", error);
         setError("Error fetching files.");
       }
     };
@@ -43,17 +51,29 @@ export const FetchFilesComponent: React.FC = () => {
   }, [account]);
 
   return (
-    <div className="flex flex-col items-center space-y-4">
-      {error && <div className="text-red-500">{error}</div>}
-
+    <div className="flex flex-col items-center space-y-4 mx-12">
       {files.length > 0 && (
-        <div className="flex flex-col items-center space-y-2">
+        <div className="flex flex-wrap justify-center -mx-2">
           {files.map((file) => (
-            <div key={file._id} className="border p-4 rounded shadow">
-              <h3 className="text-lg font-bold">{file.name}</h3>
-              <p>Category: {file.category || "N/A"}</p>
-              <p>Private: {file.isPrivate ? "Yes" : "No"}</p>
-              <MediaRenderer src={file.uri} />
+            <div key={file._id} className="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 2xl:w-1/6 px-2 mb-4">
+              <div className="flex flex-col items-center space-y-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{file.name}</CardTitle>
+                    <CardDescription>
+                      Category: {file.category || "N/A"}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <MediaRenderer src={file.uri} height={100}/>
+                  </CardContent>
+                  <CardFooter>
+                    <CardDescription>
+                      {file.isPrivate ? "Private" : "Public"}
+                    </CardDescription>
+                  </CardFooter>
+                </Card>
+              </div>
             </div>
           ))}
         </div>
