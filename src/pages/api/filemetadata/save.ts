@@ -13,7 +13,7 @@ export default async function handler(
   await connectToDatabase();
 
   if (req.method === "POST") {
-    const { name, uri, category, isPrivate, owner  } = req.body;
+    const { name, uri, category, isPrivate, owner, encryptionKey  } = req.body;
 
     try {
       const newFileMetadata = new FileMetadata({
@@ -21,7 +21,8 @@ export default async function handler(
         uri,
         category,
         isPrivate,
-        owner
+        owner,
+        encryptionKey
       });
 
       await newFileMetadata.save();

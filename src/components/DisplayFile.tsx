@@ -3,7 +3,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
-import { MediaRenderer } from "thirdweb/react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,6 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { decrypt } from '@/utils/encryption';
+import crypto from 'crypto';
 
 interface IFileMetadata {
   _id: string;
@@ -20,6 +22,7 @@ interface IFileMetadata {
   category?: string;
   isPrivate: boolean;
   owner: string;
+  encryptionKey: string;
 }
 
 export const FetchFilesComponent: React.FC = () => {
@@ -34,12 +37,17 @@ export const FetchFilesComponent: React.FC = () => {
         return;
       }
       try {
-        const url = `http://localhost:3000/api/filemetadata/read?owner=${account.address}`;
+        const url = `https://special-trout-q5r6ggw9p6w3gx4-3000.app.github.dev/api/filemetadata/read?owner=${account.address}`;
 
         const response = await axios.get(url);
         console.log("Response:", response);
 
-        setFiles(response.data);
+        const filesWithDecryptedUrls = await Promise.all(response.data.map(async (file: IFileMetadata) => {
+          const decryptedUrl = await decryptFile(file);
+          return { ...file, decryptedUrl };
+        }));
+
+        setFiles(filesWithDecryptedUrls);
         setError("");
       } catch (error) {
         console.error("Error fetching files:", error);
@@ -49,6 +57,39 @@ export const FetchFilesComponent: React.FC = () => {
 
     fetchFiles();
   }, [account]);
+
+  const decryptFile = async (file: IFileMetadata): Promise<string | null> => {
+    try {
+      // Convertir l'URL IPFS en URL HTTP
+      const ipfsGateway = "https://ipfs.io/ipfs/";
+      const fileUrl = file.uri.replace("ipfs://", ipfsGateway);
+
+      // Télécharger le fichier chiffré depuis IPFS
+      const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
+      const encryptedBuffer = Buffer.from(response.data);
+
+      // Récupérer la clé de chiffrement depuis les métadonnées
+      const key = Buffer.from(file.encryptionKey, 'hex');
+
+      // Déchiffrer le fichier
+      const decryptedBuffer = decrypt(encryptedBuffer, key);
+
+      // Convertir le buffer déchiffré en un fichier Blob
+      const mimeType = file.uri.endsWith('.pdf') ? 'application/pdf' :
+                       file.uri.endsWith('.txt') ? 'text/plain' :
+                       file.uri.endsWith('.jpg') || file.uri.endsWith('.jpeg') ? 'image/jpeg' :
+                       file.uri.endsWith('.png') ? 'image/png' :
+                       'application/octet-stream';
+      const decryptedFile = new Blob([decryptedBuffer], { type: mimeType });
+
+      // Créer une URL Blob pour le fichier déchiffré
+      return URL.createObjectURL(decryptedFile);
+    } catch (error) {
+      console.error("Error decrypting file:", error);
+      setError("Error decrypting file.");
+      return null;
+    }
+  };
 
   return (
     <div className="flex flex-col items-center space-y-4 mx-12">
@@ -63,14 +104,34 @@ export const FetchFilesComponent: React.FC = () => {
                     <CardDescription>
                       Category: {file.category || "N/A"}
                     </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <MediaRenderer src={file.uri} height={100}/>
-                  </CardContent>
-                  <CardFooter>
                     <CardDescription>
                       {file.isPrivate ? "Private" : "Public"}
                     </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {file.decryptedUrl && (
+                      <img src={file.decryptedUrl} alt="Decrypted File" style={{ width: '100%', height: 'auto' }} />
+                    )}
+                  </CardContent>
+                  <CardFooter>
+                    {file.decryptedUrl && (
+                      <div className="text-xs cursor-pointer text-purple-300">
+                        <div className="text-sm" onClick={() => window.open(file.decryptedUrl, '_blank')}>
+                          Open
+                        </div>
+                        <div className="text-xs cursor-pointer text-purple-300" onClick={() => {
+                          const a = document.createElement('a');
+                          a.href = file.decryptedUrl;
+                          a.download = file.name;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(file.decryptedUrl);
+                        }}>
+                          Download
+                        </div>
+                      </div>
+                    )}
                   </CardFooter>
                 </Card>
               </div>
@@ -78,6 +139,7 @@ export const FetchFilesComponent: React.FC = () => {
           ))}
         </div>
       )}
+      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };
