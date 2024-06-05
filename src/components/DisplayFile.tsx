@@ -1,19 +1,11 @@
 "use client";
-
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useActiveAccount } from "thirdweb/react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { decrypt } from '@/utils/encryption';
-import crypto from 'crypto';
+import FileViewer from 'react-file-viewer';
+import * as pdfjsLib from 'pdfjs-dist';
 
 interface IFileMetadata {
   _id: string;
@@ -23,6 +15,8 @@ interface IFileMetadata {
   isPrivate: boolean;
   owner: string;
   encryptionKey: string;
+  decryptedUrl?: string;
+  thumbnailUrl?: string;
 }
 
 export const FetchFilesComponent: React.FC = () => {
@@ -38,15 +32,12 @@ export const FetchFilesComponent: React.FC = () => {
       }
       try {
         const url = `https://special-trout-q5r6ggw9p6w3gx4-3000.app.github.dev/api/filemetadata/read?owner=${account.address}`;
-
         const response = await axios.get(url);
-        console.log("Response:", response);
-
         const filesWithDecryptedUrls = await Promise.all(response.data.map(async (file: IFileMetadata) => {
           const decryptedUrl = await decryptFile(file);
-          return { ...file, decryptedUrl };
+          const thumbnailUrl = file.uri.endsWith('.pdf') ? await generatePdfThumbnail(decryptedUrl) : decryptedUrl;
+          return { ...file, decryptedUrl, thumbnailUrl };
         }));
-
         setFiles(filesWithDecryptedUrls);
         setError("");
       } catch (error) {
@@ -60,33 +51,47 @@ export const FetchFilesComponent: React.FC = () => {
 
   const decryptFile = async (file: IFileMetadata): Promise<string | null> => {
     try {
-      // Convertir l'URL IPFS en URL HTTP
       const ipfsGateway = "https://ipfs.io/ipfs/";
       const fileUrl = file.uri.replace("ipfs://", ipfsGateway);
-
-      // Télécharger le fichier chiffré depuis IPFS
       const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
       const encryptedBuffer = Buffer.from(response.data);
-
-      // Récupérer la clé de chiffrement depuis les métadonnées
       const key = Buffer.from(file.encryptionKey, 'hex');
-
-      // Déchiffrer le fichier
       const decryptedBuffer = decrypt(encryptedBuffer, key);
-
-      // Convertir le buffer déchiffré en un fichier Blob
       const mimeType = file.uri.endsWith('.pdf') ? 'application/pdf' :
                        file.uri.endsWith('.txt') ? 'text/plain' :
                        file.uri.endsWith('.jpg') || file.uri.endsWith('.jpeg') ? 'image/jpeg' :
                        file.uri.endsWith('.png') ? 'image/png' :
+                       file.uri.endsWith('.gif') ? 'image/gif' :
+                       file.uri.endsWith('.bmp') ? 'image/bmp' :
+                       file.uri.endsWith('.csv') ? 'text/csv' :
+                       file.uri.endsWith('.xlsx') ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' :
+                       file.uri.endsWith('.docx') ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
+                       file.uri.endsWith('.mp4') ? 'video/mp4' :
+                       file.uri.endsWith('.webm') ? 'video/webm' :
+                       file.uri.endsWith('.mp3') ? 'audio/mpeg' :
                        'application/octet-stream';
       const decryptedFile = new Blob([decryptedBuffer], { type: mimeType });
-
-      // Créer une URL Blob pour le fichier déchiffré
       return URL.createObjectURL(decryptedFile);
     } catch (error) {
       console.error("Error decrypting file:", error);
       setError("Error decrypting file.");
+      return null;
+    }
+  };
+
+  const generatePdfThumbnail = async (pdfUrl: string): Promise<string | null> => {
+    try {
+      const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 1 });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      return canvas.toDataURL();
+    } catch (error) {
+      console.error("Error generating PDF thumbnail:", error);
       return null;
     }
   };
@@ -100,9 +105,8 @@ export const FetchFilesComponent: React.FC = () => {
               <div className="flex flex-col items-center space-y-2">
                 <Card>
                   <CardHeader>
-                    <CardTitle>{file.name}</CardTitle>
                     <CardDescription>
-                      Category: {file.category || "N/A"}
+                      
                     </CardDescription>
                     <CardDescription>
                       {file.isPrivate ? "Private" : "Public"}
@@ -110,16 +114,21 @@ export const FetchFilesComponent: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     {file.decryptedUrl && (
-                      <img src={file.decryptedUrl} alt="Decrypted File" style={{ width: '100%', height: 'auto' }} />
+                      <FileViewer
+                        fileType={file.uri.split('.').pop()}
+                        filePath={file.decryptedUrl}
+                        errorComponent={<div>Error loading file</div>}
+                        unsupportedComponent={<div>Unsupported file type</div>}
+                      />
                     )}
                   </CardContent>
                   <CardFooter>
                     {file.decryptedUrl && (
-                      <div className="text-xs cursor-pointer text-purple-300">
-                        <div className="text-sm" onClick={() => window.open(file.decryptedUrl, '_blank')}>
-                          Open
+                      <div className="flex justify-between mt-2">
+                        <div className="text-xs cursor-pointer" onClick={() => window.open(file.decryptedUrl, '_blank')}>
+                          Open in Browser
                         </div>
-                        <div className="text-xs cursor-pointer text-purple-300" onClick={() => {
+                        <div className="text-xs cursor-pointer" onClick={() => {
                           const a = document.createElement('a');
                           a.href = file.decryptedUrl;
                           a.download = file.name;
