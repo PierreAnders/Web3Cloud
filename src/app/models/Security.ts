@@ -2,8 +2,14 @@ import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypt
 
 export class Security {
     private algorithm = 'aes-192-cbc';
-    private password = 'secretPassword'; // Trouver une solution sécurisé !
+    private password: string;
 
+    constructor() {
+        if (!process.env.SECRET_PASSWORD) {
+            throw new Error('SECRET_PASSWORD is not defined');
+        }
+        this.password = process.env.SECRET_PASSWORD;
+    }
     encrypt(content: string): string {
 
         const key = scryptSync(this.password, 'salt', 24);

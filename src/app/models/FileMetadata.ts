@@ -5,7 +5,8 @@ interface IFileMetadata extends Document {
     uri: string;
     category: string;
     isPrivate: boolean;
-    owner: string
+    owner: string;
+    encryptionKey: string; 
 }
 
 const FileMetadataSchema = new Schema<IFileMetadata>({
@@ -13,7 +14,8 @@ const FileMetadataSchema = new Schema<IFileMetadata>({
     uri: { type: String, required : true },
     category: { type: String, required: false },
     isPrivate: { type: Boolean, required: true},
-    owner: { type: String, required: true}
+    owner: { type: String, required: true},
+    encryptionKey: { type: String, required: true }
 })
 
 const FileMetadata = models.FileMetadata || model<IFileMetadata>('FileMetadata', FileMetadataSchema);

@@ -23,6 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { encrypt } from '@/utils/encryption';
+import crypto from 'crypto';
 
 export const UploadComponent: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -49,20 +51,42 @@ export const UploadComponent: React.FC = () => {
       return;
     }
     try {
+      // Lire le fichier en tant que buffer
+      const fileBuffer = await selectedFile.arrayBuffer();
+      const buffer = Buffer.from(fileBuffer);
+
+      // Générer une clé de chiffrement
+      const key = crypto.randomBytes(32);
+
+      // Chiffrer le fichier
+      const encryptedBuffer = encrypt(buffer, key);
+
+      // Convertir le buffer chiffré en un objet Blob
+      const encryptedBlob = new Blob([encryptedBuffer], { type: selectedFile.type });
+
+      // Convertir le Blob en File
+      const encryptedFile = new File([encryptedBlob], selectedFile.name, {
+        type: selectedFile.type,
+        lastModified: Date.now(),
+      });
+
+      // Télécharger le fichier chiffré sur IPFS
       const uri = await upload({
         client,
-        files: [selectedFile],
+        files: [encryptedFile],
       });
       console.log("Fichier téléversé avec succès, URIs: ", uri);
       setFileUri(uri);
       setError("");
 
+      // Sauvegarder les métadonnées du fichier et la clé de chiffrement
       await axios.post("api/filemetadata/save", {
         name: fileName,
         uri: uri,
         category: category,
         isPrivate: isPrivate,
         owner: account?.address,
+        encryptionKey: key.toString('hex'), // Sauvegarder la clé en hexadécimal
       });
     } catch (error) {
       setError("Error uploading file.");
