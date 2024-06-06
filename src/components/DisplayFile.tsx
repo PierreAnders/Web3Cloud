@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useActiveAccount } from "thirdweb/react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { decrypt } from '@/utils/encryption';
 import FileViewer from 'react-file-viewer';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -16,10 +15,13 @@ interface IFileMetadata {
   owner: string;
   encryptionKey: string;
   decryptedUrl?: string;
-  thumbnailUrl?: string;
 }
 
-export const FetchFilesComponent: React.FC = () => {
+interface FetchFilesComponentProps {
+  refresh: boolean;
+}
+
+export const FetchFilesComponent: React.FC<FetchFilesComponentProps> = ({ refresh }) => {
   const [files, setFiles] = useState<IFileMetadata[]>([]);
   const [error, setError] = useState<string>("");
   const account = useActiveAccount();
@@ -35,8 +37,7 @@ export const FetchFilesComponent: React.FC = () => {
         const response = await axios.get(url);
         const filesWithDecryptedUrls = await Promise.all(response.data.map(async (file: IFileMetadata) => {
           const decryptedUrl = await decryptFile(file);
-          const thumbnailUrl = file.uri.endsWith('.pdf') ? await generatePdfThumbnail(decryptedUrl) : decryptedUrl;
-          return { ...file, decryptedUrl, thumbnailUrl };
+          return { ...file, decryptedUrl };
         }));
         setFiles(filesWithDecryptedUrls);
         setError("");
@@ -47,7 +48,7 @@ export const FetchFilesComponent: React.FC = () => {
     };
 
     fetchFiles();
-  }, [account]);
+  }, [account, refresh]); // Ajout de `refresh` comme dépendance
 
   const decryptFile = async (file: IFileMetadata): Promise<string | null> => {
     try {
@@ -79,76 +80,29 @@ export const FetchFilesComponent: React.FC = () => {
     }
   };
 
-  const generatePdfThumbnail = async (pdfUrl: string): Promise<string | null> => {
-    try {
-      const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-      const page = await pdf.getPage(1);
-      const viewport = page.getViewport({ scale: 1 });
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      await page.render({ canvasContext: context, viewport: viewport }).promise;
-      return canvas.toDataURL();
-    } catch (error) {
-      console.error("Error generating PDF thumbnail:", error);
-      return null;
-    }
-  };
-
   return (
-    <div className="flex flex-col items-center space-y-4 mx-12">
+    <div className="mx-auto overflow-hidden max-h-screen">
       {files.length > 0 && (
-        <div className="flex flex-wrap justify-center -mx-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
           {files.map((file) => (
-            <div key={file._id} className="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 2xl:w-1/6 px-2 mb-4">
-              <div className="flex flex-col items-center space-y-2">
-                <Card>
-                  <CardHeader>
-                    <CardDescription>
-                      
-                    </CardDescription>
-                    <CardDescription>
-                      {file.isPrivate ? "Private" : "Public"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {file.decryptedUrl && (
-                      <FileViewer
-                        fileType={file.uri.split('.').pop()}
-                        filePath={file.decryptedUrl}
-                        errorComponent={<div>Error loading file</div>}
-                        unsupportedComponent={<div>Unsupported file type</div>}
-                      />
-                    )}
-                  </CardContent>
-                  <CardFooter>
-                    {file.decryptedUrl && (
-                      <div className="flex justify-between mt-2">
-                        <div className="text-xs cursor-pointer" onClick={() => window.open(file.decryptedUrl, '_blank')}>
-                          Open in Browser
-                        </div>
-                        <div className="text-xs cursor-pointer" onClick={() => {
-                          const a = document.createElement('a');
-                          a.href = file.decryptedUrl;
-                          a.download = file.name;
-                          document.body.appendChild(a);
-                          a.click();
-                          document.body.removeChild(a);
-                          URL.revokeObjectURL(file.decryptedUrl);
-                        }}>
-                          Download
-                        </div>
-                      </div>
-                    )}
-                  </CardFooter>
-                </Card>
+            <div key={file._id} className="">
+              <div className="h-48 overflow-hidden-container">
+                {file.decryptedUrl && (
+                  <FileViewer
+                    fileType={file.uri.split('.').pop()}
+                    filePath={file.decryptedUrl}
+                    errorComponent={<div>Error loading file</div>}
+                    unsupportedComponent={<div>Unsupported file type</div>}
+                  />
+                )}
+              </div>
+              <div className="text-xs mt-2 text-center text-gray-400">
+                {file.name}.{file.uri.split('.').pop()}
               </div>
             </div>
           ))}
         </div>
       )}
-      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };
