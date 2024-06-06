@@ -8,10 +8,11 @@ if (!MONGODB_URI) {
   );
 }
 
-let cached = (global as any).mongoose;
+// Utilisez le type global défini dans global.d.ts
+let cached = global.mongoose;
 
 if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
 async function connectToDatabase() {
