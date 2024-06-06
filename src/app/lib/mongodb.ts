@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI: string = process.env.MONGODB_URI as string;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error(
@@ -8,25 +8,11 @@ if (!MONGODB_URI) {
   );
 }
 
-// Utilisez le type global défini dans global.d.ts
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
-
 async function connectToDatabase() {
-  if (cached.conn) {
-    return cached.conn;
+  if (typeof MONGODB_URI !== 'string') {
+    throw new Error("MONGODB_URI must be a string");
   }
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
-      return mongoose;
-    });
-  }
-  cached.conn = await cached.promise;
-  return cached.conn;
+  return mongoose.connect(MONGODB_URI);
 }
 
 export default connectToDatabase;
