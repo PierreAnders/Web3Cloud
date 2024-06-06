@@ -34,3 +34,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .overflow-hidden-container > * {
+    overflow: hidden !important;
+  }
+}
