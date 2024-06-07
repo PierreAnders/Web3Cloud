@@ -33,7 +33,7 @@ export const FetchFilesComponent: React.FC<FetchFilesComponentProps> = ({ refres
         return;
       }
       try {
-        const url = `https://localhost:3000/api/filemetadata/read?owner=${account.address}`;
+        const url = `http://localhost:3000/api/filemetadata/read?owner=${account.address}`;
         // const url = `https://special-trout-q5r6ggw9p6w3gx4-3000.app.github.dev/api/filemetadata/read?owner=${account.address}`;
         const response = await axios.get(url);
         const filesWithDecryptedUrls = await Promise.all(response.data.map(async (file: IFileMetadata) => {
