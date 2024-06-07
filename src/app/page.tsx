@@ -11,7 +11,6 @@ const FetchFilesComponent = dynamic(() => import('@/components/DisplayFile').the
 
 export default function Home() {
   const account = useActiveAccount();
-  const [refreshFiles, setRefreshFiles] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -21,23 +20,19 @@ export default function Home() {
     }
   }, []);
 
-  const handleFileUploadSuccess = () => {
-    setRefreshFiles(prev => !prev); // Toggle the state to trigger a re-render
-  };
-
   return (
     <main className="mx-auto">
       <HeroSection />
       {account && isClient && (
         <>
           <div className="mb-20 mt-12 flex justify-center">
-            <UploadComponent onUploadSuccess={handleFileUploadSuccess} />
+            <UploadComponent />
           </div>
           <div className="mx-auto mt-4 w-2/3">
             {/* <SearchBarComponent /> */}
           </div>
           <div className="my-2 flex justify-center">
-            <FetchFilesComponent refresh={refreshFiles} />
+            <FetchFilesComponent />
           </div>
           <div className="my-10 flex justify-center text-xs text-gray-600">ETH: {account.address}</div>
         </>

@@ -17,12 +17,8 @@ type IFileMetadata = {
   decryptedUrl?: string;
 };
 
-type FetchFilesComponentProps = {
-  refresh: boolean;
-};
 
-
-export const FetchFilesComponent: React.FC<FetchFilesComponentProps> = ({ refresh }) => {
+export const FetchFilesComponent: React.FC = () => {
   const [files, setFiles] = useState<IFileMetadata[]>([]);
 
   const account = useActiveAccount();
@@ -46,7 +42,7 @@ export const FetchFilesComponent: React.FC<FetchFilesComponentProps> = ({ refres
     };
 
     fetchFiles();
-  }, [account, refresh]); // Ajout de `refresh` comme dépendance
+  }, [account]);
 
   const decryptFile = async (file: IFileMetadata): Promise<string | null> => {
     try {

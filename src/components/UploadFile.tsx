@@ -26,11 +26,7 @@ import {
 import { encrypt } from '@/utils/encryption';
 import crypto from 'crypto';
 
-type UploadComponentProps = {
-  onUploadSuccess: () => void;
-}
-
-export const UploadComponent: React.FC<UploadComponentProps> = ({ onUploadSuccess }) => {
+export const UploadComponent: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileUri, setFileUri] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -92,8 +88,6 @@ export const UploadComponent: React.FC<UploadComponentProps> = ({ onUploadSucces
         encryptionKey: key.toString('hex'), // Sauvegarder la clé en hexadécimal
       });
 
-      // Appeler la fonction de succès après l'upload
-      onUploadSuccess();
     } catch (error) {
       setError("Error uploading file.");
     }
