@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useActiveAccount } from "thirdweb/react";
 import { decrypt } from '@/utils/encryption';
-import FileViewer from 'react-file-viewer';
-import * as pdfjsLib from 'pdfjs-dist';
+import FileViewer from "react-file-viewer";
 
-interface IFileMetadata {
+
+type IFileMetadata = {
   _id: string;
   name: string;
   uri: string;
@@ -15,35 +15,33 @@ interface IFileMetadata {
   owner: string;
   encryptionKey: string;
   decryptedUrl?: string;
-}
+};
 
-interface FetchFilesComponentProps {
+type FetchFilesComponentProps = {
   refresh: boolean;
-}
+};
+
 
 export const FetchFilesComponent: React.FC<FetchFilesComponentProps> = ({ refresh }) => {
   const [files, setFiles] = useState<IFileMetadata[]>([]);
-  const [error, setError] = useState<string>("");
+
   const account = useActiveAccount();
 
   useEffect(() => {
     const fetchFiles = async () => {
       if (!account?.address) {
-        setError("User address is required.");
         return;
       }
       try {
-        const url = `https://special-trout-q5r6ggw9p6w3gx4-3000.app.github.dev/api/filemetadata/read?owner=${account.address}`;
+        const url = `https://localhost:3000/api/filemetadata/read?owner=${account.address}`;
+        // const url = `https://special-trout-q5r6ggw9p6w3gx4-3000.app.github.dev/api/filemetadata/read?owner=${account.address}`;
         const response = await axios.get(url);
         const filesWithDecryptedUrls = await Promise.all(response.data.map(async (file: IFileMetadata) => {
           const decryptedUrl = await decryptFile(file);
           return { ...file, decryptedUrl };
         }));
         setFiles(filesWithDecryptedUrls);
-        setError("");
       } catch (error) {
-        console.error("Error fetching files:", error);
-        setError("Error fetching files.");
       }
     };
 
@@ -65,7 +63,7 @@ export const FetchFilesComponent: React.FC<FetchFilesComponentProps> = ({ refres
                        file.uri.endsWith('.gif') ? 'image/gif' :
                        file.uri.endsWith('.bmp') ? 'image/bmp' :
                        file.uri.endsWith('.csv') ? 'text/csv' :
-                       file.uri.endsWith('.xlsx') ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' :
+                       file.uri.endsWith('.xlsx') ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : // Not working
                        file.uri.endsWith('.docx') ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
                        file.uri.endsWith('.mp4') ? 'video/mp4' :
                        file.uri.endsWith('.webm') ? 'video/webm' :
@@ -74,19 +72,17 @@ export const FetchFilesComponent: React.FC<FetchFilesComponentProps> = ({ refres
       const decryptedFile = new Blob([decryptedBuffer], { type: mimeType });
       return URL.createObjectURL(decryptedFile);
     } catch (error) {
-      console.error("Error decrypting file:", error);
-      setError("Error decrypting file.");
       return null;
     }
   };
 
   return (
-    <div className="mx-auto overflow-hidden max-h-screen">
+    <div className="mx-auto max-h-screen overflow-hidden">
       {files.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {files.map((file) => (
             <div key={file._id} className="">
-              <div className="h-48 overflow-hidden-container">
+              <div className="overflow-hidden-container h-48">
                 {file.decryptedUrl && (
                   <FileViewer
                     fileType={file.uri.split('.').pop()}
@@ -96,7 +92,7 @@ export const FetchFilesComponent: React.FC<FetchFilesComponentProps> = ({ refres
                   />
                 )}
               </div>
-              <div className="text-xs mt-2 text-center text-gray-400">
+              <div className="mt-2 text-center text-xs text-gray-400">
                 {file.name}.{file.uri.split('.').pop()}
               </div>
             </div>

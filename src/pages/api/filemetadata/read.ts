@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import connectToDatabase from "@/app/lib/mongodb";
-import FileMetadata from "@/app/models/FileMetadata";
+import { FileMetadata } from "@/app/models/FileMetadata"
+
 
 export default async function handler(
   req: NextApiRequest,

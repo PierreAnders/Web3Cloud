@@ -1,36 +1,17 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import connectToDatabase from "@/app/lib/mongodb";
-import FileMetadata from "@/app/models/FileMetadata";
+// src/pages/api/filemetadata/save.ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { FileMetadata } from '@/app/models/FileMetadata';
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  await connectToDatabase();
-
-  if (req.method === "POST") {
-    const { name, uri, category, isPrivate, owner, encryptionKey  } = req.body;
-
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'POST') {
     try {
-      const newFileMetadata = new FileMetadata({
-        name,
-        uri,
-        category,
-        isPrivate,
-        owner,
-        encryptionKey
-      });
-
-      await newFileMetadata.save();
-      res.status(201).json({ message: "Data saved successfully" });
+      const fileMetadata = new FileMetadata(req.body);
+      await fileMetadata.save();
+      res.status(201).json(fileMetadata);
     } catch (error) {
-      res.status(500).json({ message: "Server error" });
+      res.status(400).json({ error: (error as Error).message });
     }
   } else {
-    res.status(405).json({ message: "Method not allowed" });
+    res.status(405).json({ error: 'Method not allowed' });
   }
 }

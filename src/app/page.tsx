@@ -1,14 +1,25 @@
 "use client"
 
 import { HeroSection } from "@/components/HeroSection";
-import { UploadComponent } from "@/components/UploadFile";
-import { FetchFilesComponent } from "@/components/DisplayFile";
+import dynamic from 'next/dynamic';
 import { useActiveAccount } from "thirdweb/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+// Importation dynamique des composants
+const UploadComponent = dynamic(() => import('@/components/UploadFile').then(mod => mod.UploadComponent), { ssr: false });
+const FetchFilesComponent = dynamic(() => import('@/components/DisplayFile').then(mod => mod.FetchFilesComponent), { ssr: false });
 
 export default function Home() {
   const account = useActiveAccount();
   const [refreshFiles, setRefreshFiles] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // Ce code ne s'exécutera que côté client
+    if (typeof window !== "undefined") {
+      setIsClient(true);
+    }
+  }, []);
 
   const handleFileUploadSuccess = () => {
     setRefreshFiles(prev => !prev); // Toggle the state to trigger a re-render
@@ -17,18 +28,18 @@ export default function Home() {
   return (
     <main className="mx-auto">
       <HeroSection />
-      {account && (
+      {account && isClient && (
         <>
           <div className="mb-20 mt-12 flex justify-center">
             <UploadComponent onUploadSuccess={handleFileUploadSuccess} />
           </div>
           <div className="mx-auto mt-4 w-2/3">
-          {/* <SearchBarComponent /> */}
+            {/* <SearchBarComponent /> */}
           </div>
-          <div className="mb-2 mt-2 flex justify-center">
+          <div className="my-2 flex justify-center">
             <FetchFilesComponent refresh={refreshFiles} />
           </div>
-          <div className="flex justify-center text-gray-600 text-xs mt-10 mb-10">ETH: {account.address}</div>
+          <div className="my-10 flex justify-center text-xs text-gray-600">ETH: {account.address}</div>
         </>
       )}
     </main>

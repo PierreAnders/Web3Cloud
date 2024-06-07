@@ -26,7 +26,7 @@ import {
 import { encrypt } from '@/utils/encryption';
 import crypto from 'crypto';
 
-interface UploadComponentProps {
+type UploadComponentProps = {
   onUploadSuccess: () => void;
 }
 
@@ -36,7 +36,7 @@ export const UploadComponent: React.FC<UploadComponentProps> = ({ onUploadSucces
   const [error, setError] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
   const [category, setCategory] = useState<string>("");
-  const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [isPrivate] = useState<boolean>(false);
   const account = useActiveAccount();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +79,6 @@ export const UploadComponent: React.FC<UploadComponentProps> = ({ onUploadSucces
         client,
         files: [encryptedFile],
       });
-      console.log("Fichier téléversé avec succès, URIs: ", uri);
       setFileUri(uri);
       setError("");
 
@@ -97,7 +96,6 @@ export const UploadComponent: React.FC<UploadComponentProps> = ({ onUploadSucces
       onUploadSuccess();
     } catch (error) {
       setError("Error uploading file.");
-      console.log(error);
     }
   };
 
